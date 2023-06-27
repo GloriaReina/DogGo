@@ -1,0 +1,99 @@
+﻿@model DogGo.Models.ViewModels.WalkerViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Walker Profile</h1>
+<section class="container">
+    <img style="width:100px;float:left;margin-right:20px"
+         src="https://upload.wikimedia.org/wikipedia/commons/a/a0/Font_Awesome_5_regular_user-circle.svg" />
+
+    <div>
+        <label class="font-weight-bold">Name:</label>
+        <span>@Model.Walker.Name</span>
+    </div>
+    <div>
+        <label class="font-weight-bold">Neighborhood:</label>
+        <span>@Model.Walker.Neighborhood.Name</span>
+    </div>
+
+    <h1>Recent Walks</h1>
+    <table class="table">
+        <thead>
+            
+            <tr>
+                <th>
+                    <h1>Date</h1>
+                </th>
+                <th>
+                        <h1>Client Name</h1>
+                </th>
+                <th>
+                        <h1>Duration</h1>
+                </th>
+                <th>
+                        <h1>Owner Name</h1>
+                </th>
+            </tr>
+            
+        </thead>
+        <tbody>
+@foreach (var item in Model.WalkList) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dog.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dog.Owner.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new {  id=item.Id  }) 
+                           
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+      @*  @Html.ActionLink("Edit", "Edit", new {  id = Model.Walker.Id  }) |*@
+        <a asp-action="Index">Back to List</a>
+    </div>
+@*<div>
+    <h4>Walker</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.NeighborhoodId)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.NeighborhoodId)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ImageUrl)
+        </dt>
+        <dd class = "col-sm-10">
+            <img class="bg-info" src="@Model.ImageUrl" alt="avatar" />
+        </dd>
+    </dl>
+</div>*@
+
+
