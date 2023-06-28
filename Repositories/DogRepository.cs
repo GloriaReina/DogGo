@@ -73,6 +73,7 @@ namespace DogGo.Repositories
             }
         }
 
+
         public void AddDog(Dog dog)
         {
             using (SqlConnection conn = Connection)
@@ -81,28 +82,73 @@ namespace DogGo.Repositories
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    INSERT INTO Dog (
-                        [Name],
-                        Breed,
-                        Notes,
-                        ImageUrl,
-                        OwnerId)
-                    OUTPUT INSERTED.ID
-                    VALUES (@name, @breed, @notes, @imageUrl, @ownerId);
-                ";
+                INSERT INTO Dog ([Name], OwnerId, Breed, Notes, ImageUrl)
+                OUTPUT INSERTED.ID
+                VALUES (@name, @ownerId, @breed, @notes, @imageUrl);
+            ";
 
                     cmd.Parameters.AddWithValue("@name", dog.Name);
                     cmd.Parameters.AddWithValue("@breed", dog.Breed);
-                    cmd.Parameters.AddWithValue("@notes", dog.Notes);
-                    cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
                     cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
 
-                    int id = (int)cmd.ExecuteScalar();
+                    // nullable columns
+                    if (dog.Notes == null)
+                    {
+                        cmd.Parameters.AddWithValue("@notes", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@notes", dog.Notes);
+                    }
 
-                    dog.Id = id;
+                    if (dog.ImageUrl == null)
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", DBNull.Value);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
+                    }
+
+
+                    int newlyCreatedId = (int)cmd.ExecuteScalar();
+
+                    dog.Id = newlyCreatedId;
+
                 }
             }
         }
+
+        //public void AddDog(Dog dog)
+        //{
+        //    using (SqlConnection conn = Connection)
+        //    {
+        //        conn.Open();
+        //        using (SqlCommand cmd = conn.CreateCommand())
+        //        {
+        //            cmd.CommandText = @"
+        //            INSERT INTO Dog (
+        //                [Name],
+        //                Breed,
+        //                Notes,
+        //                ImageUrl,
+        //                OwnerId)
+        //            OUTPUT INSERTED.ID
+        //            VALUES (@name, @breed, @notes, @imageUrl, @ownerId);
+        //        ";
+
+        //            cmd.Parameters.AddWithValue("@name", dog.Name);
+        //            cmd.Parameters.AddWithValue("@breed", dog.Breed);
+        //            cmd.Parameters.AddWithValue("@notes", dog.Notes);
+        //            cmd.Parameters.AddWithValue("@imageUrl", dog.ImageUrl);
+        //            cmd.Parameters.AddWithValue("@ownerId", dog.OwnerId);
+
+        //            int id = (int)cmd.ExecuteScalar();
+
+        //            dog.Id = id;
+        //        }
+        //    }
+        //}
 
         public void UpdateDog(Dog dog)
         {

@@ -3,6 +3,7 @@ using DogGo.Models.ViewModels;
 using DogGo.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace DogGo.Controllers
 {
@@ -12,21 +13,52 @@ namespace DogGo.Controllers
 
         private readonly IWalkerRepository _walkerRepo;
         private readonly IWalkRepository _walkRepo;
+        private readonly IOwnerRepository _ownerRepo;
+
+        private int GetCurrentUserId()
+        {
+            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id);
+        }
 
         // Constructor / ASP.NET will give us an instance of our Walker Repository when creating an instance of WalkersController. This is called "Dependency Injection"
-        public WalkersController(IWalkerRepository walkerRepository, IWalkRepository walkRepository)
+        public WalkersController(IWalkerRepository walkerRepository, IWalkRepository walkRepository, IOwnerRepository ownerRepo)
         {
             _walkerRepo = walkerRepository;
             _walkRepo = walkRepository;
+            _ownerRepo = ownerRepo;
         }
 
 
         // Code will get all the walkers in the Walker table, convert it to a List and pass it off to the view.
         public ActionResult Index()
         {
-            List<Walker> walkers = _walkerRepo.GetAllWalkers();
+            try
+            {
+                int ownerId = GetCurrentUserId();
 
-            return View(walkers);
+                Owner logInOwner = _ownerRepo.GetOwnerById(ownerId);
+
+                if (logInOwner == null || logInOwner.Id != ownerId)
+                {
+                    return NotFound();
+
+                }
+
+                else
+                {
+
+                    List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(logInOwner.NeighborhoodId);
+
+                    return View(walkers);
+                }
+            }
+            catch (Exception ex)
+            {
+                List<Walker> walkers = _walkerRepo.GetAllWalkers();
+                return View(walkers);
+            }
+
         }
 
 
