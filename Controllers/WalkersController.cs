@@ -15,10 +15,20 @@ namespace DogGo.Controllers
         private readonly IWalkRepository _walkRepo;
         private readonly IOwnerRepository _ownerRepo;
 
+        //private int GetCurrentUserId()
+        //{
+        //    string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    return int.Parse(id);
+        //}
+
         private int GetCurrentUserId()
         {
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.Parse(id);
+            if (id != null)
+            {
+                return int.Parse(id);
+            }
+            else { return 0; }
         }
 
         // Constructor / ASP.NET will give us an instance of our Walker Repository when creating an instance of WalkersController. This is called "Dependency Injection"
@@ -30,36 +40,27 @@ namespace DogGo.Controllers
         }
 
 
+
         // Code will get all the walkers in the Walker table, convert it to a List and pass it off to the view.
         public ActionResult Index()
         {
-            try
             {
                 int ownerId = GetCurrentUserId();
 
                 Owner logInOwner = _ownerRepo.GetOwnerById(ownerId);
+                List<Walker> walkerList = _walkerRepo.GetAllWalkers();
 
-                if (logInOwner == null || logInOwner.Id != ownerId)
+
+                if (ownerId != 0)
                 {
-                    return NotFound();
-
+                    List<Walker> neighborhoodWalkers = walkerList.Where(x => x.NeighborhoodId == logInOwner.NeighborhoodId).ToList();
+                    return View(neighborhoodWalkers);
                 }
 
-                else
-                {
-
-                    List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(logInOwner.NeighborhoodId);
-
-                    return View(walkers);
-                }
+                return View(walkerList);
             }
-            catch (Exception ex)
-            {
-                List<Walker> walkers = _walkerRepo.GetAllWalkers();
-                return View(walkers);
-            }
-
         }
+
 
 
         // GET: When the ASP.NET framework invokes this method for us, it will take whatever value is in the url and pass it to the Details method ie. Walkers/Details/5--> pass value of 5

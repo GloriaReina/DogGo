@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Diagnostics;
 
 namespace DogGo.Controllers
 {
@@ -15,6 +16,8 @@ namespace DogGo.Controllers
         private readonly IDogRepository _dogRepo;
         private readonly IWalkerRepository _walkerRepo;
         private readonly INeighborhoodRepository _neighborhoodRepo;
+
+        
 
         // Constructor / ASP.NET will give us an instance of our Walker Repository when creating an instance of WalkersController. This is called "Dependency Injection"
         public OwnersController(
@@ -34,6 +37,7 @@ namespace DogGo.Controllers
         {
             return View();
         }
+
 
 
         [HttpPost]
@@ -60,7 +64,7 @@ namespace DogGo.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 new ClaimsPrincipal(claimsIdentity));
 
-            return RedirectToAction("Index", "Dogs");
+            return RedirectToAction("Index", "Owners");
         }
 
         public async Task<ActionResult> Logout()
